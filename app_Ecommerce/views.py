@@ -5,7 +5,10 @@ from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import CategorySerializer, ProductSerializer, CheckoutSerializer, ReviewSerializer, PaymentSerializer, CustomUserSerializer
+from django.contrib.auth.models import User
+from rest_framework import authentication
+from rest_framework import exceptions
+from .serializers import CategorySerializer, ProductSerializer, CheckoutSerializer, ReviewSerializer, PaymentSerializer
 
 # Create your views here.
 class CategoryList(generics.ListCreateAPIView):
@@ -160,5 +163,15 @@ class paymentDetail(APIView):
         payment.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     
-class CustomUserCreateView(generics.CreateAPIView):
-    serializer_class = CustomUserSerializer
+class UserAuthentication(authentication.BaseAuthentication):
+    def authenticate(self, request):
+        username = request.META.get('HTTP_X_USERNAME')
+        if not username:
+            return None
+
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            raise exceptions.AuthenticationFailed('No such user')
+
+        return (user, None)

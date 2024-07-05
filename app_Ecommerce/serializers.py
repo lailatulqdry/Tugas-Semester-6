@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Category, Product, CheckOut, Review, Payment, CustomUser
+from .models import Category, Product, CheckOut, Review, Payment
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -73,18 +73,3 @@ class PaymentSerializer(serializers.Serializer):
             'status',
             'payment_time',
         ]
-
-class CustomUserSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True)
-
-    class Meta:
-        model = CustomUser
-        fields = ['email', 'username', 'password']
-
-    def create(self, validated_data):
-        user = CustomUser.objects.create_user(
-            email=validated_data['email'],
-            username=validated_data['username'],
-            password=validated_data['password']
-        )
-        return user
