@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App Ecommerce</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+</head>
+<body>
+    <div id="header">
+        <div class="container">
+            <nav>
+                <img src="/static/images/logo.png" class="logo">
+                <ul>
+                    <li><a href="http://127.0.0.1:8000/api/category">Category</a></li>
+                    <li><a href="http://127.0.0.1:8000/api/product">Product</a></li>
+                    <li><a href="http://127.0.0.1:8000/api/checkout">Check Out</a></li>
+                    <li><a href="http://127.0.0.1:8000/api/review">Review</a></li>
+                    <li><a href="http://127.0.0.1:8000/api/payment">Payment</a></li>
+                    <li><a href="http://127.0.0.1:8000/api/wishlist"><img src="/static/images/simpan.png" alt="user"></a></li>
+                    <li><a href="http://127.0.0.1:8000/api/cart"><img src="/static/images/keranjang.png" alt="user"></a></li>
+                    <li><a href="http://127.0.0.1:8000/api/users"><img src="/static/images/account.png" alt="user"></a></li>
+                </ul>
+            </nav>
+            <div class="header-text">
+                <p>dyMall</p>
+                <h1>Hi,<br>Selamat Datang di <span>DyMall !</span></h1>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

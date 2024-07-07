@@ -1,6 +1,6 @@
 from django.shortcuts import render
-from rest_framework import generics
-from .models import Category, Product, CheckOut, Review, Payment
+from rest_framework import generics, permissions
+from .models import Category, Product, CheckOut, Review, Payment, Wishlist, Cart
 from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -8,12 +8,18 @@ from rest_framework import status
 from django.contrib.auth.models import User
 from rest_framework import authentication
 from rest_framework import exceptions
-from .serializers import CategorySerializer, ProductSerializer, CheckoutSerializer, ReviewSerializer, PaymentSerializer
+from .serializers import CategorySerializer, ProductSerializer, CheckoutSerializer, ReviewSerializer, PaymentSerializer, UserSerializer, WishlistSerializer, CartSerializer
+from django.shortcuts import render
+from rest_framework import viewsets
+
 
 # Create your views here.
+def tampilan(request):
+    return render(request, 'Tampilan.html')
 class CategoryList(generics.ListCreateAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 class CategoryDetail(APIView):
     """
     Retrieve, update or delete a snippet instance.
@@ -42,9 +48,10 @@ class CategoryDetail(APIView):
         kategori.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     
-class ProductList(generics.ListCreateAPIView):
+class ProductCreateView(generics.ListCreateAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 class ProductDetail(APIView):
     """
         Retrieve, update or delete a snippet instance.
@@ -72,10 +79,12 @@ class ProductDetail(APIView):
         product = self.get_object(pk)
         product.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-    
+
+
 class CheckoutList(generics.ListCreateAPIView):
     queryset = CheckOut.objects.all()
     serializer_class = CheckoutSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
 class CheckoutDetail(APIView):
     """
@@ -103,6 +112,10 @@ class CheckoutDetail(APIView):
 class ReviewList(generics.ListCreateAPIView):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
 class ReviewDetail(APIView):
     """
@@ -134,6 +147,7 @@ class ReviewDetail(APIView):
 class paymentList(generics.ListCreateAPIView):
     queryset = Payment.objects.all()
     serializer_class = PaymentSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
 class paymentDetail(APIView):
     """
@@ -175,3 +189,38 @@ class UserAuthentication(authentication.BaseAuthentication):
             raise exceptions.AuthenticationFailed('No such user')
 
         return (user, None)
+    
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    # def perform_create(self, serializer):
+    #     user = serializer.save()
+    #     token, created = Token.objects.get_or_create(user=user)
+    #     serializer.instance.token = token.key
+    #     serializer.save()
+
+    # def perform_update(self, serializer):
+    #     user = serializer.save()
+    #     token, created = Token.objects.get_or_create(user=user)
+    #     serializer.instance.token = token.key
+    #     serializer.save()
+
+class WishlistListCreateView(generics.ListCreateAPIView):
+    queryset = Wishlist.objects.all()
+    serializer_class = WishlistSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+class WishlistDetailView(generics.RetrieveDestroyAPIView):
+    queryset = Wishlist.objects.all()
+    serializer_class = WishlistSerializer
+
+class CartListCreateView(generics.ListCreateAPIView):
+    queryset = Cart.objects.all()
+    serializer_class = CartSerializer
+    permission_classes = [permissions.IsAuthenticated] 
+
+class CartDetailView(generics.RetrieveDestroyAPIView):
+    queryset = Cart.objects.all()
+    serializer_class = CartSerializer
